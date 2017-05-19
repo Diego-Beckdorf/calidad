@@ -1,5 +1,7 @@
 def read_cell(board, row, column):
-    return board.cells[row][column]
+    cells = board.cells
+    cell = cells[row][column]
+    return cell
 
 
 def read_column(board, column):
