@@ -1,5 +1,5 @@
 class Board(object):
-    def __init__(self, dimension):
+    def __init__(self, dimension=0):
         self.dimension = dimension
         self.cells = []
         for row in range(dimension):

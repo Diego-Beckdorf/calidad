@@ -9,7 +9,8 @@ def is_cell_available(board, row, column):
 
 
 def write_cell(board, row, column, sign):
-    if (utilities.is_coordinates_inside_bounds(board=board, row=row, column=column)
+    if (utilities.is_coordinates_inside_bounds(board=board, row=row,
+                                               column=column)
             and is_cell_available(board=board, row=row, column=column)):
         board.cells[row][column] = sign
         return True
