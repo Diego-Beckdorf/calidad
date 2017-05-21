@@ -1,17 +1,20 @@
-import console
+from console import Console
 import utilities
 
 
-class Inputverifier(object):
+class InputVerifier(object):
     def __init__(self):
+        self.notifier = Console()
         self.columns_labels = 'abcdefghijklmnopqrstuvwxyz'
-        self.instructions_set = ['start', 'board', 'play', 'score', 'exit', 'help']
+        self.instructions_set = ['start', 'board', 'play',
+                                 'score', 'exit', 'help']
 
     def verify_instruction(self, user_input):
         user_input = user_input.split()
         instruction = user_input[0].lower()
         if instruction not in self.instructions_set:
-            console.write_line(message='Error: Unrecognized instruction.')
+            message = 'Error: Unrecognized instruction.'
+            self.notifier.write_line(message=message)
             return False
         return instruction
 
@@ -30,25 +33,33 @@ class Inputverifier(object):
         dimension = user_input[-1]
         if utilities.is_integer(dimension):
             dimension = int(dimension)
-            if dimension > 0:
+            if dimension > 0 and dimension <=26:
                 return dimension
-            console.write_line(
-                message='Error: Board dimension must be larger than zero.')
+            message = 'Error: Board dimension must be larger than zero.'
+            self.notifier.write_line(message=message)
             return False
-        console.write_line(message='Error: Board dimension must be an integer.')
+        message = 'Error: Board dimension must be an integer.'
+        self.notifier.write_line(message=message)
         return False
 
     def play_arguments(self, user_input):
+        user_input = user_input.lower()
         user_input = user_input.split()
         coordinates = user_input[-1]
         column_label = coordinates[0]
         column = self.columns_labels.find(column_label)
         if not utilities.is_integer(coordinates[1:]):
-            console.write_line(message='Error: Coordinates not allow.')
+            message = 'Error: Coordinates not allow.'
+            self.notifier.write_line(message=message)
             return None
         row = int(coordinates[1:]) - 1
         if row < 0:
-            console.write_line(message='Error: Row outside board bounds.')
+            message = 'Error: Row outside board bounds.'
+            self.notifier.write_line(message=message)
             return None
         sign = user_input[1]
+        if sign not in 'ox':
+            message = 'Error: Player sign not valid.'
+            self.notifier.write_line(message=message)
+            return None
         return [column, row, sign]

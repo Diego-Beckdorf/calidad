@@ -1,4 +1,3 @@
-import board_reader
 import board_writer
 import console
 from input_verifier import InputVerifier
@@ -12,6 +11,7 @@ class TicTacToe(object):
         self.expected_player = 'o'
         self.silent_flag = False
         self.console = console.Console()
+        self.input_verifier = InputVerifier()
         self.board = None
         self.score = {'games': 0, 'o': 0, 'x': 0, 'tied': 0}
 
@@ -22,8 +22,8 @@ class TicTacToe(object):
             self.silent_flag = True
 
     def start(self, user_input):
-        options = input_verifier.check_start_options(user_input=user_input)
-        verified_board_dimension = input_verifier.verify_board_dimension(
+        options = self.input_verifier.check_start_options(user_input=user_input)
+        verified_board_dimension = self.input_verifier.verify_board_dimension(
             user_input=user_input)
         if not verified_board_dimension:
             return False
@@ -34,7 +34,7 @@ class TicTacToe(object):
         return True
 
     def play(self, user_input):
-        arguments = input_verifier.play_arguments(user_input=user_input)
+        arguments = self.input_verifier.play_arguments(user_input=user_input)
         column = arguments[0]
         row = arguments[1]
         sign = arguments[2]
@@ -53,7 +53,7 @@ class TicTacToe(object):
 
     def row_winner(self, board):
         for row_index in range(board.dimension):
-            row = board_reader.read_row(board=board, row=row_index)
+            row = board.read_row(row=row_index)
             if row.count('o') == board.dimension:
                 return 'o'
             elif row.count('x') == board.dimension:
@@ -62,7 +62,7 @@ class TicTacToe(object):
 
     def column_winner(self, board):
         for column_index in range(board.dimension):
-            column = board_reader.read_column(board=board, column=column_index)
+            column = board.read_column(column=column_index)
             if column.count('o') == board.dimension:
                 return 'o'
             elif column.count('x') == board.dimension:
@@ -70,8 +70,8 @@ class TicTacToe(object):
         return None
 
     def diagonal_winner(self, board):
-        main_diagonal = board_reader.read_diagonal(board=board)
-        anti_diagonal = board_reader.read_diagonal(board=board, main=False)
+        main_diagonal = board.read_diagonal()
+        anti_diagonal = board.read_diagonal(main=False)
         if (main_diagonal.count('o') == board.dimension or
                 anti_diagonal.count('o') == board.dimension):
             return 'o'
@@ -100,42 +100,44 @@ class TicTacToe(object):
 
     def update_game_status(self):
         winner = self.check_game_result()
-        self.console.show_winner(winner=winner)
         if winner:
+            self.console.show_winner(winner=winner)
             self.score[winner] += 1
             self.board = None
             self.game_started = False
 
 
 def main():
-    input_verifier = InputVerifier()
     tic_tac_toe = TicTacToe()
+    input_verifier = tic_tac_toe.input_verifier
     game_console = tic_tac_toe.console
     welcome_message = 'Hello! How about a game of TicTacToe?'
-    console.write_line(message=welcome_message)
-    options = ''
+    game_console.write_line(message=welcome_message)
     while True:
-        user_input = console.read_line()
+        user_input = game_console.read_line()
         user_input = user_input.lower()
         verified_instruction = input_verifier.verify_instruction(
             user_input=user_input)
         if not verified_instruction:
             continue
         if verified_instruction == 'start' and not tic_tac_toe.game_started:
-            board = tic_tac_toe.start(user_input=user_input)
+            tic_tac_toe.start(user_input=user_input)
         elif verified_instruction == 'start':
-            game_console.write_line(message='Game already started. GAME ON!')
+            message = 'Game already started. GAME ON!'
+            game_console.write_line(message=message)
             continue
         if verified_instruction == 'board' and not tic_tac_toe.game_started:
-            game_console.write_line(message='There is no game started to display.')
+            message = 'There is no game started to display.'
+            game_console.write_line(message=message)
         elif verified_instruction == 'board':
-            game_console.show_board(board=board)
+            game_console.show_board(board=tic_tac_toe.board)
         if verified_instruction == 'play' and not tic_tac_toe.game_started:
-            game_console.write_line(message='There is no game started to play on.')
+            message = 'There is no game started to play on.'
+            game_console.write_line(message=message)
         elif verified_instruction == 'play':
             if not tic_tac_toe.play(user_input=user_input):
                 continue
-            board = tic_tac_toe.update_game_status()
+            tic_tac_toe.update_game_status()
         if verified_instruction == 'score':
             game_console.show_score(score=tic_tac_toe.score)
         if verified_instruction == 'exit':
