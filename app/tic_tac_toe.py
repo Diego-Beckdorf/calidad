@@ -88,6 +88,8 @@ class TicTacToe(object):
 
     def check_game_result(self):
         board = self.board
+        if board is None:
+            return False
         if self.row_winner(board=board):
             return self.row_winner(board=board)
         if self.column_winner(board=board):

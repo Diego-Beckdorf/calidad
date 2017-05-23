@@ -28,20 +28,28 @@ class Board(object):
         return board
 
     def read_cell(self, row, column):
+        if self is None:
+            return False
         cells = self.cells
         cell = cells[row][column]
         return cell
 
     def read_column(self, column):
+        if self is None:
+            return False
         board_column = []
         for row in self.cells:
             board_column.append(row[column])
         return board_column
 
     def read_row(self, row):
+        if self is None:
+            return False
         return self.cells[row]
 
     def read_diagonal(self, main=True):
+        if self is None:
+            return False
         diagonal = []
         column = 0 if main else (self.dimension - 1)
         for row in self.cells:
