@@ -47,7 +47,7 @@ class BoardWriterTest(unittest.TestCase):
     def test_check_start_options__with_consecutive_flag__returns_consecutive_string(self):
         #Arrange
         input_verifier = InputVerifier()
-        user_input = 'start N --consecutive'
+        user_input = 'start N -consecutive'
         #Act
         options = input_verifier.check_start_options(user_input=user_input)
         expected = 'consecutive'
@@ -57,7 +57,7 @@ class BoardWriterTest(unittest.TestCase):
     def test_check_start_options__with_invalid_flag__returns_empty_string(self):
         #Arrange
         input_verifier = InputVerifier()
-        user_input = 'start N --invalid'
+        user_input = 'start N -invalid'
         #Act
         options = input_verifier.check_start_options(user_input=user_input)
         expected = ''

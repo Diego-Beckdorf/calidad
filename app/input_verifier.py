@@ -22,10 +22,12 @@ class InputVerifier(object):
         options = ''
         user_input = user_input.split()
         for option in user_input[1:]:
-            if option == '--consecutive':
+            if option == '-consecutive':
                 options += 'consecutive'
-            if option == '--silent':
+            if option == '-silent':
                 options += 'silent'
+            if option == '-online':
+                options += 'online'
         return options
 
     def verify_board_dimension(self, user_input):
@@ -42,7 +44,7 @@ class InputVerifier(object):
         self.notifier.write_line(message=message)
         return False
 
-    def play_arguments(self, user_input):
+    def play_arguments(self, user_input, online=False):
         user_input = user_input.lower()
         user_input = user_input.split()
         coordinates = user_input[-1]
@@ -57,7 +59,7 @@ class InputVerifier(object):
             message = 'Error: Row outside board bounds.'
             self.notifier.write_line(message=message)
             return None
-        sign = user_input[1]
+        sign = 'x' if online else user_input[1]
         if sign not in 'ox':
             message = 'Error: Player sign not valid.'
             self.notifier.write_line(message=message)

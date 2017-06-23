@@ -7,37 +7,61 @@ from board import Board
 class TicTacToe(object):
     def __init__(self):
         self.game_started = False
+        self.online_flag = False
+        self._opponent_found = False
+        self.is_local_turn = False
+        self._opponent_name = ''
         self.consecutive_flag = False
         self.expected_player = 'o'
         self.silent_flag = False
         self.console = console.Console()
         self.input_verifier = InputVerifier()
         self.board = None
+        self.online_score = {'games': 0, 'won': 0, 'losts': {}, 'ties': {}}
         self.score = {'games': 0, 'o': 0, 'x': 0, 'tied': 0}
 
     def set_options(self, valid_options):
+        if 'online' in valid_options:
+            self.online_flag = True
         if 'consecutive' in valid_options:
+            if self.online_flag:
+                message = "can't start game online with consecutive mode"
+                self.console.write_line(message=message)
+                return False
             self.consecutive_flag = True
         if 'silent' in valid_options:
             self.silent_flag = True
+        return True
 
     def start(self, user_input):
-        options = self.input_verifier.check_start_options(user_input=user_input)
+        options = self.input_verifier.check_start_options(
+            user_input=user_input)
         verified_board_dimension = self.input_verifier.verify_board_dimension(
             user_input=user_input)
         if not verified_board_dimension:
             return False
         self.board = Board(dimension=verified_board_dimension)
-        self.set_options(valid_options=options)
+        options_setted = self.set_options(valid_options=options)
+        if not options_setted:
+            return False
+        if self.online_flag:
+            self.online_score['games'] += 1
+        else:
+            self.score['games'] += 1
         self.game_started = True
-        self.score['games'] += 1
         return True
 
+    def on_opponent_found(self, name, local_moves_first):
+        self._opponentFound = True
+        self.is_local_turn = local_moves_first
+        self._opponent_name = name
+
     def play(self, user_input):
-        arguments = self.input_verifier.play_arguments(user_input=user_input)
+        arguments = self.input_verifier.play_arguments(user_input=user_input,
+                                                       online=self.online_flag)
         column = arguments[0]
         row = arguments[1]
-        sign = arguments[2]
+        sign = 'x' if self.online_flag else arguments[2]
         if not self.consecutive_flag and sign != self.expected_player:
             message = 'Not your turn! waiting for player {0} to play'
             parsed_message = message.format(self.expected_player)
@@ -48,6 +72,9 @@ class TicTacToe(object):
             self.console.write_line(message='Try again!')
             return False
         if not self.consecutive_flag:
+            if self.online_flag:
+                self.expected_player = 'x'
+                return True
             self.expected_player = 'o' if self.expected_player == 'x' else 'x'
         return True
 
@@ -124,6 +151,19 @@ def main():
             continue
         if verified_instruction == 'start' and not tic_tac_toe.game_started:
             tic_tac_toe.start(user_input=user_input)
+            if tic_tac_toe.online_flag:
+                from external_component import ExternalComponent
+                ext_component = ExternalComponent()
+                try:
+                    ext_component.initialize_connection()
+                    size = tic_tac_toe.board.dimension
+                    ext_component.request_online_opponent(
+                        size_of_board=size,
+                        callback_func=tic_tac_toe.on_opponent_found)
+                except RuntimeError as exception:
+                    message = 'Unable to establish connection with opoonent.'
+                    game_console.write_line(message=message)
+                    continue
         elif verified_instruction == 'start':
             message = 'Game already started. GAME ON!'
             game_console.write_line(message=message)
