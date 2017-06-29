@@ -28,3 +28,11 @@ class TicTacToeTest(unittest.TestCase):
         result = game.set_options(valid_options='onlineconsecutive')
         #Assert
         self.assertFalse(expr=result)
+
+    def test__set_options__with_silente_option__return_True(self):
+        #Arrange
+        game = app.tic_tac_toe.TicTacToe()
+        #Act
+        result = game.set_options(valid_options='silente')
+        #Assert
+        self.assertTrue(expr=result)

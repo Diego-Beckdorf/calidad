@@ -1,3 +1,4 @@
+from online_game_component import OnlineGameComponent
 import board_writer
 import console
 from input_verifier import InputVerifier
@@ -8,9 +9,7 @@ class TicTacToe(object):
     def __init__(self):
         self.game_started = False
         self.online_flag = False
-        self._opponent_found = False
-        self.is_local_turn = False
-        self._opponent_name = ''
+        self.online_game_component = OnlineGameComponent()
         self.consecutive_flag = False
         self.expected_player = 'o'
         self.silent_flag = False
@@ -45,16 +44,16 @@ class TicTacToe(object):
         if not options_setted:
             return False
         if self.online_flag:
+
             self.online_score['games'] += 1
         else:
             self.score['games'] += 1
         self.game_started = True
         return True
 
-    def on_opponent_found(self, name, local_moves_first):
-        self._opponentFound = True
-        self.is_local_turn = local_moves_first
-        self._opponent_name = name
+    def start_game(self, board_dimension):
+
+
 
     def play(self, user_input):
         arguments = self.input_verifier.play_arguments(user_input=user_input,
